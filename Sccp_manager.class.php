@@ -147,6 +147,7 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
         }
 
         $this->sccpvalues = $this->dbinterface->get_db_SccpSetting(); //Initialise core settings
+        $this->ensureAsteriskEtcPathSetting();
         $this->initializeSccpPath();  //Set required Paths
         $this->updateTimeZone();   // Get timezone from FreePBX
         //$this->findInstLangs();
@@ -686,11 +687,43 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
         }
     }
 
+    private function ensureAsteriskEtcPathSetting() {
+        $asteriskEtcSetting = $this->sccpvalues['asterisk_etc_path'] ?? array();
+        $asteriskEtcPath = $asteriskEtcSetting['data'] ?? '';
+
+        if ($asteriskEtcPath === '') {
+            $asteriskEtcPath = $this->getDefaultAsteriskEtcPath();
+            $this->sccpvalues['asterisk_etc_path'] = array(
+                'keyword' => 'asterisk_etc_path',
+                'seq' => $asteriskEtcSetting['seq'] ?? 20,
+                'type' => $asteriskEtcSetting['type'] ?? 0,
+                'data' => $asteriskEtcPath,
+                'systemdefault' => $asteriskEtcSetting['systemdefault'] ?? ''
+            );
+        }
+    }
+
+    private function getDefaultAsteriskEtcPath() {
+        $config = \FreePBX::Config();
+        $asteriskEtcPath = '';
+
+        if (is_object($config) && method_exists($config, 'get')) {
+            $asteriskEtcPath = (string) $config->get('ASTETCDIR');
+        }
+
+        if ($asteriskEtcPath === '') {
+            $asteriskEtcPath = '/etc/asterisk';
+        }
+
+        return $asteriskEtcPath;
+    }
+
     /*
      *    Check file paths and permissions
      */
 
     function initializeSccpPath() {
+        $this->ensureAsteriskEtcPathSetting();
         $this->sccppath = array(
                     'asterisk' => $this->sccpvalues['asterisk_etc_path']['data'],
                     'tftp_path' => $this->sccpvalues['tftp_path']['data'],
