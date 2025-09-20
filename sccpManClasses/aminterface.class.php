@@ -203,8 +203,8 @@ class aminterface
                 // Maybe should handle better, but
                 // need to break out of the loop as nothing more coming.
                 try {
-                    throw new \invalidArgumentException("Counts do not match on returned AMI Result");
-                } catch ( \invalidArgumentException $e) {
+                    throw new \InvalidArgumentException("Counts do not match on returned AMI Result");
+                } catch (\InvalidArgumentException $e) {
                     echo substr(strrchr(get_class($response), '\\'), 1), " ", $e->getMessage(), "\n";
                 }
                 return $response;
