@@ -12,7 +12,9 @@ namespace FreePBX\modules\Sccp_manager;
 class dbinterface
 {
 
+    private $paren_class;
     private $val_null = 'NONE'; /// REPLACE to null Field
+    private $db;
 
     public function __construct($parent_class = null)
     {

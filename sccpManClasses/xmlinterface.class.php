@@ -17,6 +17,9 @@ class xmlinterface
 {
     use \FreePBX\modules\Sccp_Manager\sccpManTraits\helperFunctions;
     private $val_null = 'NONE'; /// REPLACE to null Field
+    private $paren_class;
+    private $langCodeArray = array();
+    private $dbinterface;
 
     public function __construct($parent_class = null)
     {
