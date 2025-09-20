@@ -16,6 +16,8 @@ abstract class Response extends IncomingMessage
     protected $_events;
     protected $_completed;
     protected $keys;
+    protected $eventListEndEvent;
+    protected $eventListIsCompleted;
 
     public function __construct($rawContent)
     {
@@ -24,6 +26,8 @@ abstract class Response extends IncomingMessage
         $this->_events = array();
 // this logic is false - even if we have an error, we will not get anymore data, so is completed.
         $this->_completed = $this->isSuccess();
+        $this->eventListEndEvent = null;
+        $this->eventListIsCompleted = false;
     }
 
     public function __sleep()

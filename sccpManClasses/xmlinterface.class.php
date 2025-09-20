@@ -17,6 +17,9 @@ class xmlinterface
 {
     use \FreePBX\modules\Sccp_Manager\sccpManTraits\helperFunctions;
     private $val_null = 'NONE'; /// REPLACE to null Field
+    private $paren_class;
+    private $langCodeArray = array();
+    private $dbinterface;
 
     public function __construct($parent_class = null)
     {
@@ -256,9 +259,9 @@ class xmlinterface
                                 //Now have an array of srst addresses - maybe empty
 
                                 foreach ($srst_addrs as $netKey => $netValue) {
-                                    $nodeName = "ipAddr${netKey}";
+                                    $nodeName = "ipAddr{$netKey}";
                                     $xnode->$nodeName = $netValue['ip'];
-                                    $nodeName = "port${netKey}";
+                                    $nodeName = "port{$netKey}";
                                     $xnode->$nodeName = $netValue['port'];
                                 }
                                 break;

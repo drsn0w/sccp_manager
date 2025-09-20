@@ -16,6 +16,7 @@ class aminterface
     var $_error;
     var $_config;
     var $_test;
+    private $paren_class;
     private $_connect_state;
     private $_lastActionClass;
     private $_lastActionId;
@@ -24,7 +25,13 @@ class aminterface
     private $_DumpMessage;
     private $debug_level = 1;
     private $_incomingRawMessage;
+    private $_eventListeners = array();
+    private $_incomingMsgObjectList = array();
     private $eventListEndEvent;
+    private $eventListIsCompleted = array();
+    private $_context;
+    private $socket_param = array();
+    private $useAmiInterface = true;
 
     public function load_subspace($parent_class = null)
     {
@@ -62,8 +69,7 @@ class aminterface
                         'timeout' => 30,
                         'enabled' => true
                       );
-        $this->_eventListeners = array();
-        $this->_incomingMsgObjectList = array();
+        $this->socket_param = array('timeout' => $this->_config['timeout']);
         $this->_lastActionId = false;
         $this->_incomingRawMessage = array();
         $this->eventListEndEvent = '';
@@ -203,8 +209,8 @@ class aminterface
                 // Maybe should handle better, but
                 // need to break out of the loop as nothing more coming.
                 try {
-                    throw new \invalidArgumentException("Counts do not match on returned AMI Result");
-                } catch ( \invalidArgumentException $e) {
+                    throw new \InvalidArgumentException("Counts do not match on returned AMI Result");
+                } catch (\InvalidArgumentException $e) {
                     echo substr(strrchr(get_class($response), '\\'), 1), " ", $e->getMessage(), "\n";
                 }
                 return $response;
