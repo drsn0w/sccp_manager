@@ -93,6 +93,7 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
     private $val_null = 'NONE'; /// REPLACE to null Field
     public $sccp_model_list = array();
     private $cnf_wr = null;
+    private $cnf_read = null;
     public $sccppath = array();
     public $sccpvalues = array();
     public $sccp_conf_init = array();
@@ -100,6 +101,16 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
     public $class_error; //error construct
     public $info_warning;
     public $sccpHelpInfo = array();
+    /** @var \FreePBX\modules\Sccp_manager\aminterface */
+    public $aminterface;
+    /** @var \FreePBX\modules\Sccp_manager\dbinterface */
+    public $dbinterface;
+    /** @var \FreePBX\modules\Sccp_manager\extconfigs */
+    public $extconfigs;
+    /** @var \FreePBX\modules\Sccp_manager\formcreate */
+    public $formcreate;
+    /** @var \FreePBX\modules\Sccp_manager\xmlinterface */
+    public $xmlinterface;
 
     // Move all non sccp_manager specific functions to traits
     use \FreePBX\modules\Sccp_Manager\sccpManTraits\helperFunctions;
@@ -108,7 +119,7 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
 
     public function __construct($freepbx = null) {
         if ($freepbx == null) {
-            throw new Exception("Not given a FreePBX Object");
+            throw new \Exception("Not given a FreePBX Object");
         }
         $this->class_error = array();
         $this->FreePBX = $freepbx;
@@ -136,6 +147,7 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
         }
 
         $this->sccpvalues = $this->dbinterface->get_db_SccpSetting(); //Initialise core settings
+        $this->ensureAsteriskEtcPathSetting();
         $this->initializeSccpPath();  //Set required Paths
         $this->updateTimeZone();   // Get timezone from FreePBX
         //$this->findInstLangs();
@@ -392,8 +404,8 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
         $max_btn = (!empty($get_settings['buttonscount']) ? $get_settings['buttonscount'] : 60);
 
         for ($it = 0; $it < $max_btn; $it++) {
-            if (!empty($get_settings["button${it}_type"])) {
-                $btn_t = $get_settings["button${it}_type"];
+            if (!empty($get_settings["button{$it}_type"])) {
+                $btn_t = $get_settings["button{$it}_type"];
                 $btn_n = '';
                 $btn_opt = '';
                 if ($it == 0) {
@@ -401,9 +413,9 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
                 }
                 switch ($btn_t) {
                     case 'feature':
-                        $btn_f = $get_settings["button${it}_feature"];
+                        $btn_f = $get_settings["button{$it}_feature"];
                         // $btn_opt = (empty($get_settings['button' . $it . '_fvalue'])) ? '' : $get_settings['button' . $it . '_fvalue'];
-                        $btn_n = (empty($get_settings["button${it}_flabel"])) ? $def_feature[$btn_f]['name'] : $get_settings["button${it}_flabel"];
+                        $btn_n = (empty($get_settings["button{$it}_flabel"])) ? $def_feature[$btn_f]['name'] : $get_settings["button{$it}_flabel"];
                         $btn_opt = $btn_f;
                         if (!empty($def_feature[$btn_f]['value'])) {
                             if (empty($get_settings['button' . $it . '_fvalue'])) {
@@ -421,46 +433,46 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
                         break;
                     case 'monitor':
                         $btn_t = 'speeddial';
-                        $btn_opt = (string) $get_settings["button${it}_line"];
+                        $btn_opt = (string) $get_settings["button{$it}_line"];
                         $db_res = $this->dbinterface->getSccpDeviceTableData('SccpExtension', array('name' => $btn_opt));
                         $btn_n = $db_res[0]['label'];
                         $btn_opt .= ',' . $btn_opt . $this->hint_context['default'];
                         break;
                     case 'speeddial':
-                        if (!empty($get_settings["button${it}_input"])) {
-                            $btn_n = $get_settings["button${it}_input"];
+                        if (!empty($get_settings["button{$it}_input"])) {
+                            $btn_n = $get_settings["button{$it}_input"];
                         }
-                        if (!empty($get_settings["button${it}_phone"])) {
-                            $btn_opt = $get_settings["button${it}_phone"];
+                        if (!empty($get_settings["button{$it}_phone"])) {
+                            $btn_opt = $get_settings["button{$it}_phone"];
                             if (empty($btn_n)) {
                                 $btn_n = $btn_opt;
                             }
                         }
 
-                        if (!empty($get_settings["button${it}_hint"])) {
-                            if ($get_settings["button${it}_hint"] == "hint") {
+                        if (!empty($get_settings["button{$it}_hint"])) {
+                            if ($get_settings["button{$it}_hint"] == "hint") {
                                 if (empty($btn_n)) {
                                     $btn_t = 'line';
-                                    $btn_n = $get_settings["button${it}_hline"] . '!silent';
+                                    $btn_n = $get_settings["button{$it}_hline"] . '!silent';
                                     $btn_opt = '';
                                 } else {
                                     // $btn_opt .= ',' . $get_settings['button' . $it . '_hline'] . $this->hint_context['default'];
-                                    $btn_opt .= ',' . $get_settings["button${it}_hline"];
+                                    $btn_opt .= ',' . $get_settings["button{$it}_hline"];
                                 }
                             }
                         }
                         break;
                     case 'adv.line':
                         $btn_t = 'line';
-                        $btn_n = (string) $get_settings["button${it}_line"];
-                        $btn_n .= '@' . (string) $get_settings["button${it}_advline"];
-                        $btn_opt = (string) $get_settings["button${it}_advopt"];
+                        $btn_n = (string) $get_settings["button{$it}_line"];
+                        $btn_n .= '@' . (string) $get_settings["button{$it}_advline"];
+                        $btn_opt = (string) $get_settings["button{$it}_advopt"];
 
                         break;
                     case 'line':
                     case 'silent':
-                        if (isset($get_settings["button${it}_line"])) {
-                            $btn_n = (string) $get_settings["button${it}_line"];
+                        if (isset($get_settings["button{$it}_line"])) {
+                            $btn_n = (string) $get_settings["button{$it}_line"];
                             if ($it > 0) {
                                 if ($btn_t == 'silent') {
                                     $btn_n .= '!silent';
@@ -675,11 +687,43 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
         }
     }
 
+    private function ensureAsteriskEtcPathSetting() {
+        $asteriskEtcSetting = $this->sccpvalues['asterisk_etc_path'] ?? array();
+        $asteriskEtcPath = $asteriskEtcSetting['data'] ?? '';
+
+        if ($asteriskEtcPath === '') {
+            $asteriskEtcPath = $this->getDefaultAsteriskEtcPath();
+            $this->sccpvalues['asterisk_etc_path'] = array(
+                'keyword' => 'asterisk_etc_path',
+                'seq' => $asteriskEtcSetting['seq'] ?? 20,
+                'type' => $asteriskEtcSetting['type'] ?? 0,
+                'data' => $asteriskEtcPath,
+                'systemdefault' => $asteriskEtcSetting['systemdefault'] ?? ''
+            );
+        }
+    }
+
+    private function getDefaultAsteriskEtcPath() {
+        $config = \FreePBX::Config();
+        $asteriskEtcPath = '';
+
+        if (is_object($config) && method_exists($config, 'get')) {
+            $asteriskEtcPath = (string) $config->get('ASTETCDIR');
+        }
+
+        if ($asteriskEtcPath === '') {
+            $asteriskEtcPath = '/etc/asterisk';
+        }
+
+        return $asteriskEtcPath;
+    }
+
     /*
      *    Check file paths and permissions
      */
 
     function initializeSccpPath() {
+        $this->ensureAsteriskEtcPathSetting();
         $this->sccppath = array(
                     'asterisk' => $this->sccpvalues['asterisk_etc_path']['data'],
                     'tftp_path' => $this->sccpvalues['tftp_path']['data'],

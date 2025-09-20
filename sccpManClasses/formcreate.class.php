@@ -6,6 +6,9 @@ class formcreate
 {
     use \FreePBX\modules\Sccp_Manager\sccpManTraits\helperFunctions;
 
+    private $buttonDefLabel = 'chan-sccp';
+    private $buttonHelpLabel = 'site';
+
     public function __construct($parent_class = null) {
         $this->buttonDefLabel = 'chan-sccp';
         $this->buttonHelpLabel = 'site';
@@ -463,7 +466,7 @@ class formcreate
                                    } else {$val_check = "";}
                                 } else {$val_check = "";}
                             }
-                            echo "<input type=radio name= {$res_id} id=${res_id}_{$i} value='{$value[@value]}' {$val_check} {$opt_hide} {$opt_disabled}>";
+                            echo "<input type=radio name= {$res_id} id={$res_id}_{$i} value='{$value[@value]}' {$val_check} {$opt_hide} {$opt_disabled}>";
                             echo "<label for= {$res_id}_{$i}>{$value}</label>";
                             $i++;
                         }
