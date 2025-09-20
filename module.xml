@@ -1,7 +1,7 @@
 <module>
 	<rawname>sccp_manager</rawname>
 	<name>SCCP Manager</name>
-	<version>14.5.0.4</version>
+        <version>14.5.0.5</version>
 	<type>setup</type>
 	<category>SCCP Connectivity</category>
 	<publisher>Steve Lad, Alex GP</publisher>
@@ -42,12 +42,13 @@
 		 * Version 14.4.0.3 * - Change method of selecting phonecodepage depending on if is java phone.
 		 * Version 14.4.0.5 * - Fix issue #59.
 		 * Version 14.5.0.2 * - Fix issue #32.
-		 * Version 14.5.0.4 * - Fix issue where values with spaces are truncated. Preserve softkeys accross installs
+                 * Version 14.5.0.4 * - Fix issue where values with spaces are truncated. Preserve softkeys accross installs
+                 * Version 14.5.0.5 * - Update module for PHP 8 compatibility
 	</changelog>
 	<location>https://github.com/chan-sccp/sccp_manager</location>
 	<depends>
 		<version>15</version>
-		<phpversion>7.0</phpversion>
+                <phpversion>8.0</phpversion>
 		<phpcomponent>zip</phpcomponent>
 	</depends>
 	<supported>
