@@ -93,6 +93,7 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
     private $val_null = 'NONE'; /// REPLACE to null Field
     public $sccp_model_list = array();
     private $cnf_wr = null;
+    private $cnf_read = null;
     public $sccppath = array();
     public $sccpvalues = array();
     public $sccp_conf_init = array();
@@ -100,6 +101,16 @@ class Sccp_manager extends \FreePBX_Helpers implements \BMO {
     public $class_error; //error construct
     public $info_warning;
     public $sccpHelpInfo = array();
+    /** @var \FreePBX\modules\Sccp_manager\aminterface */
+    public $aminterface;
+    /** @var \FreePBX\modules\Sccp_manager\dbinterface */
+    public $dbinterface;
+    /** @var \FreePBX\modules\Sccp_manager\extconfigs */
+    public $extconfigs;
+    /** @var \FreePBX\modules\Sccp_manager\formcreate */
+    public $formcreate;
+    /** @var \FreePBX\modules\Sccp_manager\xmlinterface */
+    public $xmlinterface;
 
     // Move all non sccp_manager specific functions to traits
     use \FreePBX\modules\Sccp_Manager\sccpManTraits\helperFunctions;

@@ -154,11 +154,17 @@ abstract class Message
                     if (!isset($value) || $value === null || strlen($value) == 0) {
                         return '';
                     }
-                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
+                    $validatedBoolean = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    if ($validatedBoolean === true) {
                         return (boolean) $value;
-                    } elseif (filter_var($value, FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE)) {
+                    }
+
+                    $strippedValue = strip_tags((string) $value);
+                    if ($strippedValue) {
                         return (string) $value;
-                    } elseif (filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE)) {
+                    }
+
+                    if (filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE)) {
                         return (string) htmlspecialchars($value, ENT_QUOTES);
                     } else {
                         throw new AMIException("Incoming String is not sanitary. Skipping: '" . $value . "'\n");
